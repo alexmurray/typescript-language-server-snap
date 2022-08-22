@@ -40,8 +40,10 @@ parts:
       # specified
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL deepmerge
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
-      # fixup install location
+      # fixup install location to avoid symlinks pointing outside the snap
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
       mv /usr/local/share/.config/yarn $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
-      rm -f $SNAPCRAFT_PART_INSTALL/bin/typescript-language-server
-      ln -s ../usr/local/share/.config/yarn/global/node_modules/.bin/typescript-language-server $SNAPCRAFT_PART_INSTALL/bin/typescript-language-server
+      for bin in typescript-language-server tsc tsserver; do \
+        rm -f $SNAPCRAFT_PART_INSTALL/bin/$bin; \
+        ln -s ../usr/local/share/.config/yarn/global/node_modules/.bin/$bin $SNAPCRAFT_PART_INSTALL/bin/$bin; \
+      done
