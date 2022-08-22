@@ -1,0 +1,47 @@
+name: typescript-language-server
+version: 1.1.0
+summary: Typescript Language Server
+description: |
+  Language Server Protocol implementation for TypeScript wrapping tsserver.
+
+grade: stable
+confinement: strict
+base: core20
+
+apps:
+  typescript-language-server:
+    command: bin/node $SNAP/bin/typescript-language-server
+    plugs:
+      - home
+
+parts:
+  typescript-language-server:
+    plugin: npm
+    source: https://github.com/typescript-language-server/typescript-language-server.git
+    source-tag: v$SNAPCRAFT_PROJECT_VERSION
+    npm-node-version: 16.15.1
+    override-build: |
+      # install the official nodejs so we get the expected npm version
+      if [ $SNAP_ARCH == "amd64" ]; then
+        ARCH=x64
+      elif [ $SNAP_ARCH == "armhf" ]; then
+        ARCH=armv7l
+      elif [ $SNAP_ARCH == "ppc64el" ]; then
+        ARCH=ppc64le
+      else
+        ARCH=$SNAP_ARCH
+      fi
+      curl -s https://nodejs.org/dist/v16.15.1/node-v16.15.1-linux-$ARCH.tar.gz | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --strip-components=1
+      npm install -g yarn
+      yarn install
+      yarn run compile
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL $(yarn pack . | grep "Wrote tarball to" | cut -f2 -d'"')
+      # install a couple dependencies that seem to need to be manually
+      # specified
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL deepmerge
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
+      # fixup install location
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
+      mv /usr/local/share/.config/yarn $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
+      rm -f $SNAPCRAFT_PART_INSTALL/bin/typescript-language-server
+      ln -s ../usr/local/share/.config/yarn/global/node_modules/.bin/typescript-language-server $SNAPCRAFT_PART_INSTALL/bin/typescript-language-server
