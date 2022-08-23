@@ -36,9 +36,7 @@ parts:
       yarn install
       yarn run compile
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL $(yarn pack . | grep "Wrote tarball to" | cut -f2 -d'"')
-      # install a couple dependencies that seem to need to be manually
-      # specified
-      yarn global add --prefix $SNAPCRAFT_PART_INSTALL deepmerge
+      # install typescript manually as a dependency
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
       # fixup install location to avoid symlinks pointing outside the snap
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
