@@ -1,5 +1,5 @@
 name: typescript-language-server
-version: 2.0.0
+version: 2.0.1
 summary: Typescript Language Server
 description: |
   Language Server Protocol implementation for TypeScript wrapping tsserver.
@@ -19,7 +19,7 @@ parts:
     plugin: npm
     source: https://github.com/typescript-language-server/typescript-language-server.git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
-    npm-node-version: 16.17.0
+    npm-node-version: 16.17.1
     override-build: |
       # install the official nodejs so we get the expected npm version
       if [ $SNAP_ARCH == "amd64" ]; then
