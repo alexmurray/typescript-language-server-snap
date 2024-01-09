@@ -36,7 +36,7 @@ parts:
       curl -s https://nodejs.org/dist/"${NODEJS_VERSION}"/node-"${NODEJS_VERSION}"-linux-$ARCH.tar.gz | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --strip-components=1
       npm install -g yarn
       yarn install
-      yarn run compile
+      yarn build
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL $(yarn pack . | grep "Wrote tarball to" | cut -f2 -d'"')
       # install typescript manually as a dependency
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
