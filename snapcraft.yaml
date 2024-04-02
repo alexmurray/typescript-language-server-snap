@@ -20,7 +20,7 @@ parts:
     source: https://github.com/typescript-language-server/typescript-language-server.git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     build-environment:
-      - NODEJS_VERSION: "v20.11.1"
+      - NODEJS_VERSION: "v20.12.0"
     npm-node-version: $NODEJS_VERSION
     override-build: |
       # install the official nodejs so we get the expected npm version
