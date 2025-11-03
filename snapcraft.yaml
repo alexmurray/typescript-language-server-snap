@@ -6,7 +6,7 @@ description: |
 
 grade: stable
 confinement: strict
-base: core20
+base: core24
 issues: https://github.com/alexmurray/typescript-language-server-snap/issues
 website: https://github.com/typescript-language-server/typescript-language-server
 
@@ -18,12 +18,13 @@ apps:
 
 parts:
   typescript-language-server:
-    plugin: npm
+    plugin: nil
     source: https://github.com/typescript-language-server/typescript-language-server.git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     build-environment:
       - NODEJS_VERSION: "v22.14.0"
-    npm-node-version: $NODEJS_VERSION
+    build-packages:
+      - curl
     override-build: |
       # install the official nodejs so we get the expected npm version
       if [ $SNAP_ARCH == "amd64" ]; then
@@ -36,12 +37,20 @@ parts:
         ARCH=$SNAP_ARCH
       fi
       curl -s https://nodejs.org/dist/"${NODEJS_VERSION}"/node-"${NODEJS_VERSION}"-linux-$ARCH.tar.gz | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --strip-components=1
+      # get npm in PATH etc
+      export PATH=$SNAPCRAFT_PART_INSTALL/bin:$PATH
       npm install -g yarn
+      # install some build dependencies
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL rimraf
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL rollup
+      # typescript is needed as both build and runtime dependency
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
       yarn install
       yarn build
+      # remove build deps
+      yarn global remove --prefix $SNAPCRAFT_PART_INSTALL rimraf
+      yarn global remove --prefix $SNAPCRAFT_PART_INSTALL rollup
       yarn global add --prefix $SNAPCRAFT_PART_INSTALL $(yarn pack . | grep "Wrote tarball to" | cut -f2 -d'"')
-      # install typescript manually as a dependency
-      yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
       # fixup install location to avoid symlinks pointing outside the snap
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
       mv /usr/local/share/.config/yarn $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
