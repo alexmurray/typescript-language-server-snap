@@ -22,7 +22,7 @@ parts:
     source: https://github.com/typescript-language-server/typescript-language-server.git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     build-environment:
-      - NODEJS_VERSION: "v24.14.1"
+      - NODEJS_VERSION: "v24.18.0"
     build-packages:
       - curl
     override-build: |
