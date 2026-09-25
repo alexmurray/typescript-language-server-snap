@@ -37,10 +37,12 @@ parts:
         ARCH=$SNAP_ARCH
       fi
       curl -s https://nodejs.org/dist/"${NODEJS_VERSION}"/node-"${NODEJS_VERSION}"-linux-$ARCH.tar.gz | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --strip-components=1
-      # get node, npm, corepack in PATH
+      # get node and npm in PATH
       export PATH=$SNAPCRAFT_PART_INSTALL/bin:$PATH
       npm install -g pnpm
       pnpm install
       pnpm build
       pnpm pack
-      npm install -g --prefix "$SNAPCRAFT_PART_INSTALL" typescript typescript-language-server-*.tgz
+      # typescript is needed as both build and runtime dependency (must match the version expected by typescript-language-server)
+      TS_VERSION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('package.json')).devDependencies.typescript)")
+      npm install -g --prefix "$SNAPCRAFT_PART_INSTALL" "typescript@$TS_VERSION" ./typescript-language-server-*.tgz
