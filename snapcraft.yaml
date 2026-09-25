@@ -37,24 +37,10 @@ parts:
         ARCH=$SNAP_ARCH
       fi
       curl -s https://nodejs.org/dist/"${NODEJS_VERSION}"/node-"${NODEJS_VERSION}"-linux-$ARCH.tar.gz | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --strip-components=1
-      # get npm in PATH etc
+      # get node, npm, corepack in PATH
       export PATH=$SNAPCRAFT_PART_INSTALL/bin:$PATH
-      npm install -g yarn
-      # install some build dependencies
-      yarn global add --prefix $SNAPCRAFT_PART_INSTALL rimraf
-      yarn global add --prefix $SNAPCRAFT_PART_INSTALL rollup
-      # typescript is needed as both build and runtime dependency
-      yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
-      yarn install
-      yarn build
-      # remove build deps
-      yarn global remove --prefix $SNAPCRAFT_PART_INSTALL rimraf
-      yarn global remove --prefix $SNAPCRAFT_PART_INSTALL rollup
-      yarn global add --prefix $SNAPCRAFT_PART_INSTALL $(yarn pack . | grep "Wrote tarball to" | cut -f2 -d'"')
-      # fixup install location to avoid symlinks pointing outside the snap
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
-      mv /usr/local/share/.config/yarn $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
-      for bin in typescript-language-server tsc tsserver; do \
-        rm -f $SNAPCRAFT_PART_INSTALL/bin/$bin; \
-        ln -s ../usr/local/share/.config/yarn/global/node_modules/.bin/$bin $SNAPCRAFT_PART_INSTALL/bin/$bin; \
-      done
+      npm install -g pnpm
+      pnpm install
+      pnpm build
+      pnpm pack
+      npm install -g --prefix "$SNAPCRAFT_PART_INSTALL" typescript typescript-language-server-*.tgz
